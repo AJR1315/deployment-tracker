@@ -15,7 +15,7 @@ A REST API for tracking deployment history across environments.
 
 ### Completed
 
-- [ ] Python REST API with CRUD operations
+- [x] Python REST API with CRUD operations
 - [ ] PostgreSQL database integration
 - [ ] Docker containerisation
 - [ ] Local Kubernetes deployment
@@ -24,53 +24,69 @@ A REST API for tracking deployment history across environments.
 
 ## Why This Project?
 
-This project gives me a chance to learn Python, APIs, Terraform, Git, GitHub actions, as well as many other in-demand skills. I have had the chance to be hands-on with many of these through my work; however, to be able take the time and sit-down to learn each of these without using AI to write for me or spending hours reading pages of documentation without getting hands on was the main reason for this project.
+This project gives me a chance to learn Python, APIs, Terraform, Git, GitHub Actions, as well as many other in-demand skills. I have had the chance to be hands-on with many of these through my work; however, to be able to take the time and sit down to learn each of these without using AI to write for me or spending hours reading pages of documentation without getting hands-on was the main reason for this project.
 
 ## Architecture
 
-[You add this as you build - start simple, expand as you go]
+[Architecture diagram and explanation to be added as the project develops]
 
 ## Running Locally
 
 ### Prerequisites
 
-- Python 3.9 or above installed.
+- Python 3.9+ installed
 - Git (to clone the repository)
 
 ### Setup
 
-1. Clone repository:
+1. **Clone the repository**
 
 ```bash
    git clone https://github.com/yourusername/deployment-tracker.git
-   cd ./deployment-tracker/
+   cd deployment-tracker
 ```
 
-2. Create and activate your virtual environment
+2. **Create and activate virtual environment**
 
 ```bash
    python3 -m venv venv
-   source venv/bin/activate
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install requirements
+3. **Install dependencies**
 
 ```bash
    pip install -r app/requirements.txt
 ```
 
-4. Run Uvicorn app
+4. **Run the application**
 
 ```bash
    uvicorn app.src.main:app --reload
 ```
 
---reload allows for the app to restart when changes are detected
+The `--reload` flag enables hot-reloading - the server automatically restarts when you save changes to your code.
 
-### Using the app
+### Using the Application
 
-App can be accessed via the address as stated after booting:
+Once running, the terminal will display:
 
-INFO: Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+```
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+```
 
-Visit http://127.0.0.1:8000/docs#/ to find all the API endpoints and test.
+**Available URLs:**
+
+- **Interactive API docs**: http://127.0.0.1:8000/docs
+- **API root**: http://127.0.0.1:8000/
+- **Health check**: http://127.0.0.1:8000/health
+
+The `/docs` endpoint provides an interactive interface where you can test all API endpoints directly in your browser.
+
+### Available Endpoints
+
+- `GET /` - API information
+- `GET /health` - Health check
+- `GET /deployments` - List all deployments
+- `GET /deployments/{id}` - Get specific deployment by ID
+- `POST /deployments` - Create new deployment record
