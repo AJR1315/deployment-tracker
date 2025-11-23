@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: app
-          image: deployment-tracker-app:latest
-          imagePullPolicy: Never
+          image: 979115156310.dkr.ecr.eu-west-2.amazonaws.com/deployment-tracker-app:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           env:
