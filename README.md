@@ -6,240 +6,268 @@ A REST API for tracking deployment history across environments.
 
 🚧 Work in progress - Building as part of DevOps portfolio project
 
-✅ Python REST API with FastAPI
-
-- Create deployment records (POST /deployments)
-- List all deployments (GET /deployments)
-- Get single deployment by ID (GET /deployments/{id})
-- Health check endpoint
-
 ### Completed
 
 - [x] Python REST API with CRUD operations
 - [x] PostgreSQL database integration
 - [x] Docker containerisation
 - [x] Local Kubernetes deployment
-- [ ] Terraform infrastructure provisioning
+- [ ] Terraform infrastructure provisioning (AWS EKS)
 - [ ] CI/CD pipeline with GitHub Actions
 
-## Why This Project?
+## About This Project
 
-This project gives me a chance to learn Python, APIs, Terraform, Git, GitHub Actions, as well as many other in-demand skills. I have had the chance to be hands-on with many of these through my work; however, to be able to take the time and sit down to learn each of these without using AI to write for me or spending hours reading pages of documentation without getting hands-on was the main reason for this project.
+A portfolio project demonstrating end-to-end DevOps skills: building a REST API, containerising it, deploying to Kubernetes, provisioning infrastructure with Terraform, and automating everything with CI/CD.
+
+### Why I Built This
+
+This project gives me a chance to learn Python, APIs, Terraform, Git, GitHub Actions, and other in-demand DevOps skills hands-on. While I've used many of these tools at work, I wanted to build something from scratch without relying on AI to write the code for me - to genuinely understand each technology rather than just copy-pasting solutions.
+
+### Technologies Used
+
+- **Application:** Python, FastAPI, SQLAlchemy
+- **Database:** PostgreSQL
+- **Containerisation:** Docker, Docker Compose
+- **Orchestration:** Kubernetes
+- **Infrastructure as Code:** Terraform (AWS EKS)
+- **CI/CD:** GitHub Actions
 
 ## Architecture
 
-[Architecture diagram and explanation to be added as the project develops]
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        AWS Cloud                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │                    EKS Cluster                             │  │
+│  │  ┌─────────────────┐      ┌─────────────────┐             │  │
+│  │  │   App Pod       │      │  PostgreSQL Pod │             │  │
+│  │  │  ┌───────────┐  │      │  ┌───────────┐  │             │  │
+│  │  │  │  FastAPI  │  │─────▶│  │  Postgres │  │             │  │
+│  │  │  │   :8000   │  │      │  │   :5432   │  │             │  │
+│  │  │  └───────────┘  │      │  └───────────┘  │             │  │
+│  │  └─────────────────┘      └─────────────────┘             │  │
+│  │           │                        │                       │  │
+│  │           │                        │                       │  │
+│  │      ┌────┴────┐            ┌──────┴──────┐               │  │
+│  │      │ Service │            │     PVC     │               │  │
+│  │      │NodePort │            │  (Storage)  │               │  │
+│  │      └────┬────┘            └─────────────┘               │  │
+│  └───────────┼───────────────────────────────────────────────┘  │
+│              │                                                   │
+└──────────────┼───────────────────────────────────────────────────┘
+               │
+         ┌─────┴─────┐
+         │  Client   │
+         │ (Browser) │
+         └───────────┘
+```
+
+## API Endpoints
+
+| Method | Endpoint            | Description           |
+| ------ | ------------------- | --------------------- |
+| `GET`  | `/`                 | API information       |
+| `GET`  | `/health`           | Health check          |
+| `GET`  | `/deployments`      | List all deployments  |
+| `GET`  | `/deployments/{id}` | Get deployment by ID  |
+| `POST` | `/deployments`      | Create new deployment |
+
+### Example Request
+
+```bash
+curl -X POST "http://localhost:8000/deployments" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "service_name": "user-api",
+    "version": "v1.0.0",
+    "environment": "production",
+    "status": "success",
+    "deployed_by": "ashley"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "id": 1,
+  "service_name": "user-api",
+  "version": "v1.0.0",
+  "environment": "production",
+  "status": "success",
+  "deployed_by": "ashley",
+  "deployed_at": "2025-11-21T15:08:38.902638"
+}
+```
 
 ## Running the Application
 
-### Option 1: Using Docker (Recommended)
+### Option 1: Docker Compose (Recommended)
 
-The easiest way to run everything - no Python setup required.
+The simplest way to run everything locally.
 
 **Prerequisites:**
 
-- Docker Desktop installed
-- Git
+- Docker Desktop
 
 **Steps:**
 
-1. **Clone the repository**
-
 ```bash
-   git clone https://github.com/yourusername/deployment-tracker.git
-   cd deployment-tracker
+# Clone the repository
+git clone https://github.com/yourusername/deployment-tracker.git
+cd deployment-tracker
+
+# Build and start
+docker-compose up --build
+
+# Or run in background
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f app
+
+# Stop
+docker-compose down
+
+# Stop and remove all data
+docker-compose down -v
 ```
 
-2. **Build and start the application**
+**Access:** http://localhost:8000/docs
 
-```bash
-   docker-compose up --build
-```
+---
 
-This starts both PostgreSQL and the API in containers.
+### Option 2: Local Development
 
-To run in background:
-
-```bash
-   docker-compose up -d --build
-```
-
-To view logs when running in background:
-
-```bash
-   docker-compose logs -f app
-```
-
-3. **Stopping the application**
-
-```bash
-   # If running in foreground: Ctrl+C
-
-   # If running in background:
-   docker-compose down
-
-   # To also remove database data (fresh start):
-   docker-compose down -v
-```
-
-### Option 2: Local Development (Without Docker for the app)
-
-Use this when actively developing - gives you hot-reloading.
+For active development with hot-reloading.
 
 **Prerequisites:**
 
-- Python 3.9+ installed
+- Python 3.9+
 - Docker Desktop (for PostgreSQL)
-- Git
 
 **Steps:**
 
-1. **Clone the repository**
-
 ```bash
-   git clone https://github.com/yourusername/deployment-tracker.git
-   cd deployment-tracker
+# Clone the repository
+git clone https://github.com/yourusername/deployment-tracker.git
+cd deployment-tracker
+
+# Start database only
+docker-compose up -d postgres
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r app/requirements.txt
+
+# Run with hot-reload
+uvicorn app.src.main:app --reload
 ```
 
-2. **Start the database**
+**Access:** http://localhost:8000/docs
 
-```bash
-   docker-compose up -d postgres
-```
+---
 
-Note: `postgres` specifies only the database service, not the app.
+### Option 3: Local Kubernetes (minikube)
 
-3. **Create and activate virtual environment**
-
-```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-4. **Install dependencies**
-
-```bash
-   pip install -r app/requirements.txt
-```
-
-5. **Run the application**
-
-```bash
-   uvicorn app.src.main:app --reload
-```
-
-### Option 3: Using Kubernetes (Locally)
-
-For testing Kubernetes locally.
+For testing Kubernetes deployment locally.
 
 **Prerequisites:**
 
-- Docker Desktop installed
-- minikube installed
-- kubectl command line installed
+- Docker Desktop
+- minikube
+- kubectl
 
 **Steps:**
 
-1. **Clone the repository**
-
 ```bash
-   git clone https://github.com/yourusername/deployment-tracker.git
-   cd deployment-tracker
-```
+# Start minikube
+minikube start
 
-2. **Start minikube**
+# Build image in minikube's Docker
+eval $(minikube docker-env)
+docker build -t deployment-tracker-app:latest ./app
 
-```bash
-   minikube start
-```
+# Deploy
+kubectl apply -f kubernetes/
 
-3. **Build the Docker image for minikube**
-
-```bash
-   # Point your terminal to minikube's Docker
-   eval $(minikube docker-env)
-```
-
-```bash
-   # Build the image
-   docker build -t deployment-tracker-app:latest ./app
-```
-
-4. **Apply the /kubernetes .yaml files**
-
-```bash
-   kubectl apply -f kubernetes
-```
-
-5. **Access the application**
-
-```bash
-   # Use this to grab the URL that minikube assigns if using Kubernetes
-   minikube service deployment-tracker-app -n deployment-tracker --url
+# Get URL
+minikube service deployment-tracker-app -n deployment-tracker --url
 ```
 
 **Useful Commands:**
 
 ```bash
-   # See everything in the namespace
-   kubectl get all -n deployment-tracker
+# View all resources
+kubectl get all -n deployment-tracker
+
+# View app logs
+kubectl logs -n deployment-tracker -l app=deployment-tracker-app
+
+# View database logs
+kubectl logs -n deployment-tracker -l app=postgres
+
+# Restart app deployment
+kubectl rollout restart deployment/deployment-tracker-app -n deployment-tracker
+
+# Delete everything
+kubectl delete -f kubernetes/
 ```
 
-```bash
-   # View logs from the app
-   kubectl logs -n deployment-tracker -l app=deployment-tracker-app
+## Project Structure
+
+```
+deployment-tracker/
+├── app/
+│   ├── src/
+│   │   ├── __init__.py
+│   │   ├── main.py          # FastAPI application
+│   │   ├── models.py        # SQLAlchemy models
+│   │   └── database.py      # Database configuration
+│   ├── tests/
+│   ├── Dockerfile
+│   └── requirements.txt
+├── kubernetes/
+│   ├── namespace.yaml
+│   ├── configmap.yaml
+│   ├── secret.yaml
+│   ├── postgres-pvc.yaml
+│   ├── postgres-deployment.yaml
+│   ├── postgres-service.yaml
+│   ├── app-deployment.yaml
+│   └── app-service.yaml
+├── terraform/               # Coming soon
+├── .github/
+│   └── workflows/           # Coming soon
+├── docker-compose.yml
+└── README.md
 ```
 
-```bash
-   # View logs from postgres
-   kubectl logs -n deployment-tracker -l app=postgres
-```
-
-```bash
-   # Restart a deployment (if you wish to rebuild the image)
-   kubectl rollout restart deployment/deployment-tracker-app -n deployment-tracker
-```
-
-```bash
-   # Delete and start a fresh
-   kubectl delete -f kubernetes/
-```
-
-## Using the Application
-
-Once running (via either method), access:
-
-- **Interactive API docs**: http://127.0.0.1:8000/docs
-- **API root**: http://127.0.0.1:8000/
-- **Health check**: http://127.0.0.1:8000/health
-
-### Available Endpoints
-
-- `GET /` - API information
-- `GET /health` - Health check
-- `GET /deployments` - List all deployments
-- `GET /deployments/{id}` - Get specific deployment by ID
-- `POST /deployments` - Create new deployment record
+## Development Notes
 
 ### Verifying Data Persistence
 
-1. Create a few deployments via POST `/deployments`
-2. List them with GET `/deployments`
-3. Stop and restart the application
-4. List deployments again - they should still be there
+1. Create deployments via `POST /deployments`
+2. List them with `GET /deployments`
+3. Restart the application
+4. Verify data persists
 
-### Inspecting the Database (Optional)
-
-To view data directly in PostgreSQL:
+### Inspecting the Database
 
 ```bash
+# Connect to PostgreSQL
 docker exec -it deployment-tracker-db psql -U devops -d deployments
-```
 
-Once connected:
-
-```sql
+# Query deployments
 SELECT * FROM deployments;
+
+# Exit
+\q
 ```
 
-Exit with `\q`
+## License
+
+MIT
