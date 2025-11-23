@@ -10,6 +10,24 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/postgres_data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devops -d deployments"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: deployment-tracker-app
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://devops:devops123@postgres:5432/deployments
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
