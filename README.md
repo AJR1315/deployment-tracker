@@ -18,7 +18,7 @@ A REST API for tracking deployment history across environments.
 - [x] Python REST API with CRUD operations
 - [x] PostgreSQL database integration
 - [x] Docker containerisation
-- [ ] Local Kubernetes deployment
+- [x] Local Kubernetes deployment
 - [ ] Terraform infrastructure provisioning
 - [ ] CI/CD pipeline with GitHub Actions
 
@@ -126,6 +126,83 @@ Note: `postgres` specifies only the database service, not the app.
 
 ```bash
    uvicorn app.src.main:app --reload
+```
+
+### Option 3: Using Kubernetes (Locally)
+
+For testing Kubernetes locally.
+
+**Prerequisites:**
+
+- Docker Desktop installed
+- minikube installed
+- kubectl command line installed
+
+**Steps:**
+
+1. **Clone the repository**
+
+```bash
+   git clone https://github.com/yourusername/deployment-tracker.git
+   cd deployment-tracker
+```
+
+2. **Start minikube**
+
+```bash
+   minikube start
+```
+
+3. **Build the Docker image for minikube**
+
+```bash
+   # Point your terminal to minikube's Docker
+   eval $(minikube docker-env)
+```
+
+```bash
+   # Build the image
+   docker build -t deployment-tracker-app:latest ./app
+```
+
+4. **Apply the /kubernetes .yaml files**
+
+```bash
+   kubectl apply -f kubernetes
+```
+
+5. **Access the application**
+
+```bash
+   # Use this to grab the URL that minikube assigns if using Kubernetes
+   minikube service deployment-tracker-app -n deployment-tracker --url
+```
+
+**Useful Commands:**
+
+```bash
+   # See everything in the namespace
+   kubectl get all -n deployment-tracker
+```
+
+```bash
+   # View logs from the app
+   kubectl logs -n deployment-tracker -l app=deployment-tracker-app
+```
+
+```bash
+   # View logs from postgres
+   kubectl logs -n deployment-tracker -l app=postgres
+```
+
+```bash
+   # Restart a deployment (if you wish to rebuild the image)
+   kubectl rollout restart deployment/deployment-tracker-app -n deployment-tracker
+```
+
+```bash
+   # Delete and start a fresh
+   kubectl delete -f kubernetes/
 ```
 
 ## Using the Application
