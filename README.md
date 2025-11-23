@@ -17,7 +17,7 @@ A REST API for tracking deployment history across environments.
 
 - [x] Python REST API with CRUD operations
 - [x] PostgreSQL database integration
-- [ ] Docker containerisation
+- [x] Docker containerisation
 - [ ] Local Kubernetes deployment
 - [ ] Terraform infrastructure provisioning
 - [ ] CI/CD pipeline with GitHub Actions
@@ -81,6 +81,39 @@ Verify it's running:
 ```
 
 The `--reload` flag enables hot-reloading - the server automatically restarts when you save changes to your code.
+
+## Running via Docker
+
+### Prerequisites
+
+- Docker Desktop installed
+
+### Setup
+
+1. **Clone the repository**
+
+```bash
+   git clone https://github.com/yourusername/deployment-tracker.git
+   cd deployment-tracker
+```
+
+2. **Build and start app**
+
+```bash
+   docker-compose up --build
+```
+
+OR if you'd prefer to run in the background:
+
+```bash
+   docker-compose up -d --build
+```
+
+And logs:
+
+```bash
+   docker-compose logs -f app
+```
 
 ### Using the Application
 
