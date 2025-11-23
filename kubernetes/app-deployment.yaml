@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-tracker-app
+  namespace: deployment-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-tracker-app
+  template:
+    metadata:
+      labels:
+        app: deployment-tracker-app
+    spec:
+      containers:
+        - name: app
+          image: deployment-tracker-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: postgresql://devops:devops123@postgres:5432/deployments
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
