@@ -30,15 +30,18 @@ This project gives me a chance to learn Python, APIs, Terraform, Git, GitHub Act
 
 [Architecture diagram and explanation to be added as the project develops]
 
-## Running Locally
+## Running the Application
 
-### Prerequisites
+### Option 1: Using Docker (Recommended)
 
-- Python 3.9+ installed
+The easiest way to run everything - no Python setup required.
+
+**Prerequisites:**
+
 - Docker Desktop installed
-- Git (to clone the repository)
+- Git
 
-### Setup
+**Steps:**
 
 1. **Clone the repository**
 
@@ -47,19 +50,64 @@ This project gives me a chance to learn Python, APIs, Terraform, Git, GitHub Act
    cd deployment-tracker
 ```
 
-2. **Start the PostgreSQL database**
+2. **Build and start the application**
 
 ```bash
-   docker-compose up -d
+   docker-compose up --build
 ```
 
-This starts PostgreSQL in a Docker container. The `-d` flag runs it in the background.
+This starts both PostgreSQL and the API in containers.
 
-Verify it's running:
+To run in background:
 
 ```bash
-   docker-compose ps
+   docker-compose up -d --build
 ```
+
+To view logs when running in background:
+
+```bash
+   docker-compose logs -f app
+```
+
+3. **Stopping the application**
+
+```bash
+   # If running in foreground: Ctrl+C
+
+   # If running in background:
+   docker-compose down
+
+   # To also remove database data (fresh start):
+   docker-compose down -v
+```
+
+### Option 2: Local Development (Without Docker for the app)
+
+Use this when actively developing - gives you hot-reloading.
+
+**Prerequisites:**
+
+- Python 3.9+ installed
+- Docker Desktop (for PostgreSQL)
+- Git
+
+**Steps:**
+
+1. **Clone the repository**
+
+```bash
+   git clone https://github.com/yourusername/deployment-tracker.git
+   cd deployment-tracker
+```
+
+2. **Start the database**
+
+```bash
+   docker-compose up -d postgres
+```
+
+Note: `postgres` specifies only the database service, not the app.
 
 3. **Create and activate virtual environment**
 
@@ -80,56 +128,13 @@ Verify it's running:
    uvicorn app.src.main:app --reload
 ```
 
-The `--reload` flag enables hot-reloading - the server automatically restarts when you save changes to your code.
+## Using the Application
 
-## Running via Docker
-
-### Prerequisites
-
-- Docker Desktop installed
-
-### Setup
-
-1. **Clone the repository**
-
-```bash
-   git clone https://github.com/yourusername/deployment-tracker.git
-   cd deployment-tracker
-```
-
-2. **Build and start app**
-
-```bash
-   docker-compose up --build
-```
-
-OR if you'd prefer to run in the background:
-
-```bash
-   docker-compose up -d --build
-```
-
-And logs:
-
-```bash
-   docker-compose logs -f app
-```
-
-### Using the Application
-
-Once running, the terminal will display:
-
-```
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-```
-
-**Available URLs:**
+Once running (via either method), access:
 
 - **Interactive API docs**: http://127.0.0.1:8000/docs
 - **API root**: http://127.0.0.1:8000/
 - **Health check**: http://127.0.0.1:8000/health
-
-The `/docs` endpoint provides an interactive interface where you can test all API endpoints directly in your browser.
 
 ### Available Endpoints
 
@@ -141,13 +146,10 @@ The `/docs` endpoint provides an interactive interface where you can test all AP
 
 ### Verifying Data Persistence
 
-To confirm your deployments are stored in the database:
-
 1. Create a few deployments via POST `/deployments`
 2. List them with GET `/deployments`
-3. Stop the application (Ctrl+C)
-4. Restart it (`uvicorn app.src.main:app --reload`)
-5. List deployments again - they should still be there
+3. Stop and restart the application
+4. List deployments again - they should still be there
 
 ### Inspecting the Database (Optional)
 
@@ -157,22 +159,10 @@ To view data directly in PostgreSQL:
 docker exec -it deployment-tracker-db psql -U devops -d deployments
 ```
 
-Once connected, run:
+Once connected:
 
 ```sql
 SELECT * FROM deployments;
 ```
 
 Exit with `\q`
-
-### Stopping Everything
-
-```bash
-# Stop the application: Ctrl+C in the terminal running uvicorn
-
-# Stop the database:
-docker-compose down
-
-# Stop and remove all data (fresh start):
-docker-compose down -v
-```
